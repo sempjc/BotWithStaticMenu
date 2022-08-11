@@ -13,8 +13,11 @@ namespace StaticMenuBot
 {
     public class AdapterWithErrorHandler : CloudAdapter
     {
-        public AdapterWithErrorHandler(BotFrameworkAuthentication auth, ILogger<IBotFrameworkHttpAdapter> logger, IMiddleware middleware)
-            : base(auth, logger)
+        public AdapterWithErrorHandler(
+            BotFrameworkAuthentication auth, 
+            ILogger<IBotFrameworkHttpAdapter> logger,
+            IMiddleware middleware) : 
+            base(auth, logger)
         {
             OnTurnError = async (turnContext, exception) =>
             {

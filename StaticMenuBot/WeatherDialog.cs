@@ -17,12 +17,13 @@ namespace StaticMenuBot
             AddDialog(wfDialog);
         }
 
-        private Task<DialogTurnResult> Step01_CommingSoon(
+        private async Task<DialogTurnResult> Step01_CommingSoon(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            stepContext.Context.SendActivityAsync(
+            await stepContext.Context.SendActivityAsync(
                 "Commning soon!", cancellationToken: cancellationToken);
-            return stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+            return await stepContext.EndDialogAsync(
+                cancellationToken: cancellationToken);
         }
     }
 }

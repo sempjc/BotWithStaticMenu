@@ -28,12 +28,14 @@ namespace StaticMenuBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient().AddControllers().AddNewtonsoftJson();
+            //services.AddCors();
 
             // Add Middleware here
             services.AddSingleton<IMiddleware, StaticMenuMiddleware>();
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
+            services.AddSingleton<ConfigurationServiceClientCredentialFactory>();
 
             // Create the Bot Adapter with error handling enabled.
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
@@ -61,12 +63,18 @@ namespace StaticMenuBot
                 .UseWebSockets()
                 .UseRouting()
                 .UseAuthorization()
+                //.UseCors(x =>
+                //x.AllowAnyHeader()
+                //.AllowAnyMethod()
+                //.WithOrigins(
+                //    "http://localhost:3000",
+                //    "https://d216-209-91-209-104.ngrok.io"))
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
                 });
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
         }
     }
 }

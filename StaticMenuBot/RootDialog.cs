@@ -27,20 +27,18 @@ namespace StaticMenuBot
             AddDialog(new ChoicePrompt(MenuChoicePromt));
         }
 
-        private Task<DialogTurnResult> Step01_ChooseDialog(
+        private async Task<DialogTurnResult> Step01_ChooseDialog(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var choices = new List<Choice>();
             foreach(var option in Staticmenu.options)
-            {
                 choices.Add(new Choice
                 {
                     Action = option,
                     Value = option.Value.ToString(),
                 });
-            }
 
-            return stepContext.PromptAsync(
+            return await stepContext.PromptAsync(
                 MenuChoicePromt,
                 new PromptOptions
                 {
@@ -53,58 +51,62 @@ namespace StaticMenuBot
                 }, cancellationToken);
         }
 
-        private Task<DialogTurnResult> Step02_FinalStep(
+        private async Task<DialogTurnResult> Step02_FinalStep(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return stepContext.ReplaceDialogAsync(Id, null, cancellationToken);
+            return await stepContext.ReplaceDialogAsync(Id, null, cancellationToken);
         }
 
-        protected override Task<DialogTurnResult> OnContinueDialogAsync(
+
+        protected override async Task<DialogTurnResult> OnContinueDialogAsync(
             DialogContext innerDc, CancellationToken cancellationToken = default)
         {
-            return innerDc.Context.Activity.Text switch
+            string action = innerDc.Context.Activity.Text ?? 
+                innerDc.Context.Activity.Value.ToString() ?? ""; 
+
+            return action switch
             {
-                "goto:menu" => CallMenu(innerDc, cancellationToken),
-                "goto:userprofiledialog" => CallUserProfile(innerDc, cancellationToken),
-                "goto:weatherdialog" => CallWeatherDialog(innerDc, cancellationToken),
-                "goto:cancelconversation" => CancelDialog(innerDc, cancellationToken),
-                _ => base.OnContinueDialogAsync(innerDc, cancellationToken),
+                "goto:menu" => await CallMenu(innerDc, cancellationToken),
+                "goto:userprofiledialog" => await CallUserProfile(innerDc, cancellationToken),
+                "goto:weatherdialog" => await CallWeatherDialog(innerDc, cancellationToken),
+                "goto:cancelconversation" => await CancelDialog(innerDc, cancellationToken),
+                _ => await base.OnContinueDialogAsync(innerDc, cancellationToken),
             };
         }
 
-        private Task<DialogTurnResult> CancelDialog(
+        private async Task<DialogTurnResult> CancelDialog(
             DialogContext innerDc, CancellationToken cancellationToken)
         {
-            innerDc.Context.SendActivityAsync(
+            await innerDc.Context.SendActivityAsync(
                 "Conversation is cancelled.",
                 cancellationToken: cancellationToken);
-            innerDc.CancelAllDialogsAsync(
+            await innerDc.CancelAllDialogsAsync(
                 cancellationToken: cancellationToken);
-            return innerDc.ReplaceDialogAsync(
+            return await innerDc.ReplaceDialogAsync(
                 Id, 
                 cancellationToken:cancellationToken);
         }
 
-        private static Task<DialogTurnResult> CallWeatherDialog(
+        private static async Task<DialogTurnResult> CallWeatherDialog(
             DialogContext innerDc, CancellationToken cancellationToken)
         {
-            return innerDc.ReplaceDialogAsync(
+            return await innerDc.ReplaceDialogAsync(
                 nameof(WeatherDialog),
                 cancellationToken: cancellationToken);
         }
 
-        private static Task<DialogTurnResult> CallUserProfile(
+        private static async Task<DialogTurnResult> CallUserProfile(
             DialogContext innerDc, CancellationToken cancellationToken)
         {
-            return innerDc.ReplaceDialogAsync(
+            return await innerDc.ReplaceDialogAsync(
                 nameof(UserProfileDialog),
                 cancellationToken: cancellationToken);
         }
 
-        private static Task<DialogTurnResult> CallMenu(
+        private static async Task<DialogTurnResult> CallMenu(
             DialogContext innerDc, CancellationToken cancellationToken)
         {
-            return innerDc.ReplaceDialogAsync(
+            return await innerDc.ReplaceDialogAsync(
                 nameof(RootDialog),
                 cancellationToken: cancellationToken);
         }

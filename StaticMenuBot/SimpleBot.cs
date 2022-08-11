@@ -22,41 +22,38 @@ namespace StaticMenuBot
             _conversationState = conversationState;
         }
 
-        public override Task OnTurnAsync(
+        public override async Task OnTurnAsync(
             ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             if(turnContext.Activity.Type != ActivityTypes.ConversationUpdate)
-                RunDialog(turnContext, cancellationToken);
+                await RunDialog(turnContext, cancellationToken);
             else
-                base.OnTurnAsync(turnContext, cancellationToken);
+                await base.OnTurnAsync(turnContext, cancellationToken);
 
-            return _conversationState.SaveChangesAsync(
+            await _conversationState.SaveChangesAsync(
                 turnContext, false, cancellationToken);
         }
 
-        private void RunDialog(ITurnContext turnContext, CancellationToken cancellationToken)
+        private async Task RunDialog(
+            ITurnContext turnContext, CancellationToken cancellationToken)
         {
-            var dialogState = _conversationState
-                .CreateProperty<DialogState>(nameof(DialogState));
-            _dialog.RunAsync(turnContext, dialogState, cancellationToken);
+            var dialogState = _conversationState.CreateProperty<DialogState>(
+                nameof(DialogState));
+            await _dialog.RunAsync(
+                turnContext, dialogState, cancellationToken);
         }
 
-        protected override Task OnMembersAddedAsync(
+        protected override async Task OnMembersAddedAsync(
             IList<ChannelAccount> membersAdded, 
             ITurnContext<IConversationUpdateActivity> turnContext, 
             CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)
-            {
                 if (member.Id != turnContext.Activity.Recipient.Id)
-                {
-                    turnContext.SendActivityAsync(
+                    await turnContext.SendActivityAsync(
                         MessageFactory.Text($"Hello world!."), cancellationToken);
-                }
-            }
 
-            RunDialog(turnContext, cancellationToken);
-            return Task.CompletedTask;
+            await RunDialog(turnContext, cancellationToken);
         }
     }
 }

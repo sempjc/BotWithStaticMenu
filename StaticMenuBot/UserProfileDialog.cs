@@ -37,10 +37,10 @@ namespace StaticMenuBot
             AddDialog(new ConfirmPrompt(UserProfileConfirmationPromptId));
         }
 
-        private Task<DialogTurnResult> Step01_AskUserName(
+        private async Task<DialogTurnResult> Step01_AskUserName(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return stepContext.PromptAsync(
+            return await stepContext.PromptAsync(
                 NamePromptId,
                 new PromptOptions
                 {
@@ -48,11 +48,11 @@ namespace StaticMenuBot
                 }, cancellationToken);
         }
 
-        private Task<DialogTurnResult> Step02_AskAge(
+        private async Task<DialogTurnResult> Step02_AskAge(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values["name"] = stepContext.Result as string;
-            return stepContext.PromptAsync(
+            return await stepContext.PromptAsync(
                 AgePromptId,
                 new PromptOptions
                 {
@@ -61,11 +61,11 @@ namespace StaticMenuBot
                 }, cancellationToken);
         }
 
-        private Task<DialogTurnResult> Step03_AskTransportPreference(
+        private async Task<DialogTurnResult> Step03_AskTransportPreference(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values["age"] = stepContext.Result.ToString();
-            return stepContext.PromptAsync(
+            return await stepContext.PromptAsync(
                 TransportPromptId,
                 new PromptOptions
                 {
@@ -77,7 +77,7 @@ namespace StaticMenuBot
                     Style = ListStyle.HeroCard
                 }, cancellationToken);
         }
-        private Task<DialogTurnResult> Step04_UserProfileSummary(
+        private async Task<DialogTurnResult> Step04_UserProfileSummary(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var transport = ((FoundChoice)stepContext.Result).Value;
@@ -86,7 +86,7 @@ namespace StaticMenuBot
                 $"**Age**:              {stepContext.Values["age"]}\n\n" +
                 $"**Transportation**:   {transport}";
 
-            return stepContext.PromptAsync(
+            return await stepContext.PromptAsync(
                 UserProfileConfirmationPromptId,
                 new PromptOptions
                 {
@@ -98,22 +98,22 @@ namespace StaticMenuBot
                 }, cancellationToken);
         }
 
-        private Task<DialogTurnResult> Step05_FinalStep(
+        private async Task<DialogTurnResult> Step05_FinalStep(
             WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             bool confirmationResutl = (bool)stepContext.Result;
             if (confirmationResutl)
             {
-                stepContext.Context.SendActivityAsync(
+                await stepContext.Context.SendActivityAsync(
                     $"Thank your the information {stepContext.Values["name"]}",
                     cancellationToken: cancellationToken);
-                return stepContext.EndDialogAsync(null, cancellationToken);
+                return await stepContext.EndDialogAsync(null, cancellationToken);
             }
             else
             {
-                stepContext.Context.SendActivityAsync(
+                await stepContext.Context.SendActivityAsync(
                     "Ok let try again.", cancellationToken: cancellationToken);
-                return stepContext.ReplaceDialogAsync(
+                return await stepContext.ReplaceDialogAsync(
                     Id, cancellationToken: cancellationToken);
             }
         }
