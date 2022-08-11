@@ -4,9 +4,11 @@ Bot Framework v4 empty bot sample.
 
 This bot has been created using [Bot Framework](https://dev.botframework.com), it shows the minimum code required to build a bot.
 
+This bot was create to show how to use IMiddleware for create a "Static Menu". The idea is to show this menu as suggested action in all the conversation turns.
+
 ## Prerequisites
 
-- [.NET Core SDK](https://dotnet.microsoft.com/download) version 3.1
+- [.NET Core SDK](https://dotnet.microsoft.com/download) version 6.0
 
   ```bash
   # determine dotnet version
